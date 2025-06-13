@@ -27,7 +27,7 @@ export default function Post({ post }: { post: any }) {
         <View style={styles.container}>
             <View style={styles.post}>
                 <Text style={styles.title}>{post.title}</Text>
-                <Text style={styles.content}>{post.content}</Text>
+                <Text style={styles.content}>{post.content.slice(0, 100) + "..."}</Text>
             </View>
         </View>
     );
