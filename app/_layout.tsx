@@ -44,9 +44,34 @@ function RootLayoutNav() {
     }, []);
 
     return (
-        <Stack>
-            <Stack.Screen name="index" options={{ headerShown: true, headerTitle: 'CRUDMe' }} />
-        </Stack>
+        <Tabs>
+            <Tabs.Screen
+                name="index"
+                options={{
+                    title: 'Articles',
+                    tabBarIcon: ({ color }) => (
+                        <Ionicons name="list-outline" size={24} color={color} />
+                    ),
+                }}
+            />
+            <Tabs.Screen
+                name="new-article"
+                options={{
+                    title: 'Nouvel Article',
+                    tabBarIcon: ({ color }) => (
+                        <Ionicons name="add-circle-outline" size={24} color={color} />
+                    ),
+                }}
+            />
+
+            <Tabs.Screen
+                name="(stacks)"
+                options={{
+                    headerShown: false,
+                    href: null,
+                }}
+            />
+        </Tabs>
     );
 }
 
