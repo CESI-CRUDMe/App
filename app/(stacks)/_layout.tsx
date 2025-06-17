@@ -4,7 +4,7 @@ export default function StackLayout() {
     return (
         <Stack>
             <Stack.Screen
-                name="post/[id]"
+                name="posts/[id]"
                 options={{
                     headerShown: true,
                     headerBackTitle: 'Retour',
