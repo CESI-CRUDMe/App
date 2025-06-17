@@ -10,7 +10,6 @@ export default function StackLayout() {
                     headerBackTitle: 'Retour',
                     title: 'Article',
                 }}
-
             />
         </Stack>
     );
