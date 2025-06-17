@@ -27,7 +27,15 @@
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "crudme",
+          "organization": "mindlens"
+        }
+      ]
     ],
     "scheme": "crudme"
   }
