@@ -1,21 +1,14 @@
 import { createContext, useContext, useState } from "react";
 import axios from "axios";
-
-interface AuthContextType {
-    token: string | null;
-    refreshToken: string | null;
-    fetchToken: () => Promise<void>;
-}
+import AuthContextType from "@/types/AuthContextType";
 
 export const AuthContext = createContext<AuthContextType>({
     token: null,
-    refreshToken: null,
     fetchToken: () => Promise.resolve(),
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [token, setToken] = useState<string | null>(null);
-    const [refreshToken, setRefreshToken] = useState<string | null>(null);
 
     const fetchToken = async () => {
         try {
@@ -25,15 +18,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             );
             
             setToken(response.data.token);
-            setRefreshToken(response.data.refreshToken);
         } catch (error: any) {            
             setToken(null);
-            setRefreshToken(null);
         }
     };
 
     return (
-        <AuthContext.Provider value={{ token, refreshToken, fetchToken }}>
+        <AuthContext.Provider value={{ token, fetchToken }}>
             {children}
         </AuthContext.Provider>
     );
