@@ -27,7 +27,7 @@ export default function PostsScreen() {
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.list}>
                 {posts.map((post: any) => (
-                    <Link href={`/post/${post.id}`} key={post.id}>
+                    <Link href={`/posts/${post.id}`} key={post.id}>
                         <Post post={post} />
                     </Link>
                 ))}
