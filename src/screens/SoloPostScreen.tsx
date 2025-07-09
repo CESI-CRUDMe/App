@@ -1,13 +1,11 @@
 import { Stack, useFocusEffect } from "expo-router";
 import { View, Text, ScrollView, Button, StyleSheet } from "react-native";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import axios from "axios";
-import { useAuth } from "@/providers/AuthProvider";
 import * as Sentry from '@sentry/react-native';
 
 export default function SoloPostScreen(props: { id: string }) {
     const { id } = props;
-    const { token, fetchToken } = useAuth();
     const [post, setPost] = useState<any>(null);
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -17,22 +15,12 @@ export default function SoloPostScreen(props: { id: string }) {
 
     useFocusEffect(
         useCallback(() => {
-            if (token && id) {
-                axios.get(`${process.env.EXPO_PUBLIC_API_URL}/posts/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }).then((res) => {
-                    setPost(res.data.post);
-                }).catch((err) => {
-                    if (err.response.status === 498) {
-                        fetchToken();
-                    } else {
-                        Sentry.captureException(err);
-                    }
-                });
+            if (id) {
+                axios.get(`${process.env.EXPO_PUBLIC_API_URL}/posts/${id}`)
+                    .then((res) => setPost(res.data.post))
+                    .catch((err) => Sentry.captureException(err));
             }
-        }, [token, id])
+        }, [id])
     );
 
     return (

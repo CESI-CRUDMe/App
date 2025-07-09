@@ -1,9 +1,8 @@
 import { SafeAreaView, ScrollView, StyleSheet, Text  } from "react-native";
-import { useAuth } from "@/providers/AuthProvider";
 import { useEffect, useState } from "react";
 import { Link } from "expo-router";
 import Post from "@/components/Post";
-import { useApi } from "@/hooks/useApi";
+import axios from "axios";
 
 /**
  * Interface définissant la structure d'un post
@@ -25,9 +24,6 @@ export default function PostsScreen() {
     const [isLoading, setIsLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     
-    // Récupération du token d'authentification
-    const { token, fetchToken } = useAuth();
-    
     /**
      * Récupère une page de posts depuis l'API
      * @param page - Numéro de la page à charger
@@ -38,33 +34,8 @@ export default function PostsScreen() {
         
         try {
             setIsLoading(true);
-            const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/posts?page=${page}&limit=20`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                }
-            });
-            
-            if (!response.ok) {
-                // Gestion du cas où le token est expiré
-                if (response.status === 401) {
-                    const newToken = await fetchToken();
-                    if (newToken !== undefined) {
-                        // Nouvelle tentative avec le token rafraîchi
-                        const retryResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/posts?page=${page}&limit=20`, {
-                            headers: {
-                                'Authorization': `Bearer ${newToken}`,
-                            }
-                        });
-                        if (retryResponse.ok) {
-                            const data = await retryResponse.json();
-                            handlePostsData(data, page);
-                        }
-                    }
-                }
-                return;
-            }
-
-            const data = await response.json();
+            const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/posts?page=${page}&limit=20`);
+            const data = await response.data;
             handlePostsData(data, page);
         } catch (error) {
             console.error('Error fetching posts:', error);
@@ -91,7 +62,7 @@ export default function PostsScreen() {
     // Charge la première page au montage du composant
     useEffect(() => {
         fetchPosts(1);
-    }, [token]);
+    }, []);
 
     /**
      * Gère le défilement infini
@@ -112,10 +83,10 @@ export default function PostsScreen() {
             <ScrollView 
                 style={styles.list}
                 onScroll={handleScroll}
-                scrollEventThrottle={400} // Limite la fréquence des événements de scroll
+                scrollEventThrottle={400}
             >
-                {posts?.map((post: PostType) => (
-                    <Link href={`/posts/${post.id}`} key={post.id}>
+                {posts?.map((post: PostType, index: number) => (
+                    <Link href={`/posts/${post.id}`} key={`${post.id}-${index}`}>
                         <Post post={post} />
                     </Link>
                 ))}
