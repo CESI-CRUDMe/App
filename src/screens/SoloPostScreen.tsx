@@ -25,7 +25,7 @@ export default function SoloPostScreen(props: { id: string }) {
 
     return (
         <ScrollView style={styles.container}>
-            <Stack.Screen options={{ headerTitle: "Article", headerBackTitle: "Retour" }} />
+            <Stack.Screen options={{ headerTitle: "Article" }} />
             <View style={styles.content}>
                 <Text style={styles.title}>{post?.title}</Text>
                 <View style={styles.calendar}>
