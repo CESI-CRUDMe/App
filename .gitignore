@@ -38,3 +38,4 @@ yarn-error.*
 *.tsbuildinfo
 
 .env.local
+node_modules
