@@ -1,5 +1,5 @@
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
-import { Tabs, useNavigationContainerRef } from "expo-router";
+import { Stack, Tabs, useNavigationContainerRef } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import React, { useEffect } from "react";
 import * as Sentry from '@sentry/react-native';
@@ -30,11 +30,6 @@ Sentry.init({
     // uncomment the line below to enable Spotlight (https://spotlightjs.com)
     // spotlight: __DEV__,
 });
-Sentry.mobileReplayIntegration({
-    maskAllText: true,
-    maskAllImages: true,
-    maskAllVectors: true,
-});
 
 function RootLayoutNav() {
     const { fetchToken } = useAuth();
@@ -44,34 +39,22 @@ function RootLayoutNav() {
     }, []);
 
     return (
-        <Tabs>
-            <Tabs.Screen
-                name="index"
+        <Stack>
+            <Stack.Screen
+                name="(tabs)"
                 options={{
-                    title: 'Articles',
-                    tabBarIcon: ({ color }) => (
-                        <Ionicons name="list-outline" size={24} color={color} />
-                    ),
-                }}
-            />
-            <Tabs.Screen
-                name="new-article"
-                options={{
-                    title: 'Nouvel Article',
-                    tabBarIcon: ({ color }) => (
-                        <Ionicons name="add-circle-outline" size={24} color={color} />
-                    ),
+                    headerShown: false
                 }}
             />
 
-            <Tabs.Screen
-                name="(stacks)"
+            <Stack.Screen
+                name="posts/[id]"
                 options={{
-                    headerShown: false,
-                    href: null,
+                    headerShown: true,
+                    title: 'Article',
                 }}
             />
-        </Tabs>
+        </Stack>
     );
 }
 
