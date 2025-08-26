@@ -81,6 +81,37 @@ export default function CreatePostScreen() {
         }
     }, []);
 
+    // Nouvelle fonction pour prendre une photo avec la caméra
+    const captureImage = useCallback(async () => {
+        const perm = await ImagePicker.requestCameraPermissionsAsync();
+        if (!perm.granted) {
+            Alert.alert('Permission', 'Autorisez l\'accès à la caméra.');
+            return;
+        }
+        const res = await ImagePicker.launchCameraAsync({
+            allowsEditing: true,
+            base64: true,
+            quality: 0.85,
+        });
+        if (!res.canceled && res.assets?.length) {
+            const asset = res.assets[0];
+            if (asset.base64) {
+                let cleaned = asset.base64.replace(/\s/g, '');
+                while (cleaned.length % 4 !== 0) cleaned += '=';
+                const isValid = /^[A-Za-z0-9+/=]+$/.test(cleaned);
+                if (!isValid) {
+                    Alert.alert('Erreur', 'Encodage base64 invalide.');
+                    return;
+                }
+                const mime = asset.mimeType || 'image/jpeg';
+                setImageRawBase64(cleaned);
+                setImageMime(mime);
+                setImageUri(asset.uri || null);
+                setImageDataUri(`data:${mime};base64,${cleaned}`);
+            }
+        }
+    }, []);
+
     const removeImage = () => { setImageRawBase64(null); setImageMime(null); setImageUri(null); setImageDataUri(null); };
 
     const resetForm = () => {
@@ -175,12 +206,17 @@ export default function CreatePostScreen() {
                                 <Text style={styles.imageSelectedText}>Image sélectionnée</Text>
                             </View>
                             <View style={styles.imageButtonsRow}>
-                                <Pressable onPress={pickImage} style={[styles.smallButton, styles.primaryButton]}><Text style={styles.smallButtonText}>Changer</Text></Pressable>
+                                <Pressable onPress={pickImage} style={[styles.smallButton, styles.primaryButton]}><Text style={styles.smallButtonText}>Galerie</Text></Pressable>
+                                <Pressable onPress={captureImage} style={[styles.smallButton, styles.primaryButton]}><Text style={styles.smallButtonText}>Photo</Text></Pressable>
                                 <Pressable onPress={removeImage} style={[styles.smallButton, styles.dangerButton]}><Text style={styles.smallButtonText}>Supprimer</Text></Pressable>
                             </View>
                         </View>
                     ) : (
-                        <Pressable onPress={pickImage} style={styles.dashedBox}><Text style={styles.dashedText}>Appuyer pour choisir une image</Text></Pressable>
+                        // Deux options : galerie ou caméra
+                        <View>
+                            <Pressable onPress={pickImage} style={styles.dashedBox}><Text style={styles.dashedText}>Choisir une image (galerie)</Text></Pressable>
+                            <Pressable onPress={captureImage} style={styles.dashedBox}><Text style={styles.dashedText}>Prendre une photo</Text></Pressable>
+                        </View>
                     )}
 
                     <View style={styles.actionsRow}>
