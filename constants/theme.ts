@@ -19,6 +19,7 @@ export const radii = {
   sm: 8,
   md: 12,
   lg: 18,
+  pill: 24, // added for consistent pill-shaped buttons
 };
 
 export const shadows = {

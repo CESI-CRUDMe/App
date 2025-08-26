@@ -4,7 +4,7 @@ import { useUser } from '@/providers/AuthProvider';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default function LoginScreen() {
     const { login, guestLogin } = useUser();
@@ -72,8 +72,9 @@ const styles = StyleSheet.create({
     formCard: { marginTop: -40, marginHorizontal: 24, backgroundColor: colors.card, borderRadius: radii.lg, padding: 24, borderWidth: 1, borderColor: colors.border, ...shadows.card },
     title: { fontSize: 22, fontWeight: '700', marginBottom: 22, color: colors.text, textAlign: 'center' },
     input: { borderWidth: 1, borderColor: colors.border, backgroundColor: '#fff', borderRadius: radii.md, padding: 14, marginBottom: 14, fontSize: 16, color: colors.text },
-    button: { backgroundColor: colors.primary, paddingVertical: 14, borderRadius: radii.md, alignItems: 'center', marginTop: 4 },
+    baseButton: { paddingVertical: 14, borderRadius: radii.pill, alignItems: 'center' },
+    button: { backgroundColor: colors.primary, ...Platform.select({ default: {} }), borderRadius: radii.pill, paddingVertical: 14, alignItems: 'center', marginTop: 4 },
     buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-    secondaryButton: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.primary, marginTop: 14 },
+    secondaryButton: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.primary, marginTop: 14, borderRadius: radii.pill },
     secondaryButtonText: { color: colors.primary },
 });

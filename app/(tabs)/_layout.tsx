@@ -28,7 +28,7 @@ export default function TabLayout() {
                     shadowColor: 'transparent',
                     borderRadius: 0,
                 },
-                tabBarItemStyle: { paddingTop: 6 },
+                tabBarItemStyle: {},
                 tabBarBackground: () => (
                     <LinearGradient
                         colors={[colors.gradientStart, colors.gradientEnd]}
@@ -53,7 +53,9 @@ export default function TabLayout() {
                 options={{
                     href: isLogged ? '/(tabs)/Post' : null, // si pas loggé, retiré de la barre
                     title: 'Post',
-                    tabBarIcon: ({ color, focused }) => <Ionicons size={26} name={focused ? 'add-circle' : 'add-circle-outline'} color={color} />,
+                    tabBarIcon: ({ color, focused }) => (
+                        <Ionicons style={{ marginTop: 2 }} size={26} name={focused ? 'add-circle' : 'add-circle-outline'} color={color} />
+                    ),
                 }}
             />
             <Tabs.Screen
