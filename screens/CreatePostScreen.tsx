@@ -118,11 +118,12 @@ export default function CreatePostScreen() {
             fd.append('contact_name', contactName);
             fd.append('contact_phone', contactPhone);
             if (imageRawBase64 && imageMime && imageDataUri) {
-                // L'API accepte soit text_image_base64 (prioritaire) soit image_base64. On lui fournit image_base64 au format Data URI complet.
-                fd.append('image_base64', imageDataUri); // data:<mime>;base64,<data>
+                fd.append('image_base64', imageDataUri);
             }
             await axios.post('https://crudme.mindlens.fr/api/posts', fd, { headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'multipart/form-data' } });
-            Alert.alert('Succès', 'Post créé avec succès', [{ text: 'OK', onPress: () => { resetForm(); router.push('/(tabs)'); } }]);
+            resetForm();
+            // Redirige avec paramètres flash
+            router.replace({ pathname: '/(tabs)', params: { flash: 'created', msg: encodeURIComponent('Post créé avec succès') } });
         } catch (e: any) {
             Alert.alert('Erreur', e?.response?.data?.message || 'Création impossible');
         } finally {
