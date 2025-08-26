@@ -3,6 +3,7 @@ import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import useSWR from "swr";
 import { useState } from "react";
+import axios from "axios";
 
 export default function PostScreen(props: { id: string }) {   
     const { id } = props;
@@ -13,7 +14,10 @@ export default function PostScreen(props: { id: string }) {
         setIsExpanded(!isExpanded);
     }
 
-    const fetcher = (url: string) => fetch(url).then(res => res.json());
+    const fetcher = async (url: string) => {
+        const response = await axios.get(url);
+        return response.data;
+    };
 
     const { data, error, isLoading } = useSWR(`https://api.crudme.mindlens.fr/posts?id=${id}`, fetcher);
 
@@ -26,7 +30,7 @@ export default function PostScreen(props: { id: string }) {
 
     return (
         <ScrollView style={styles.container}>
-                <Stack.Screen options={{ headerTitle: post.title.toString(), headerBackTitle: "Retour" }} />
+            <Stack.Screen options={{ headerTitle: post.title.toString(), headerBackTitle: "Retour" }} />
             <View style={styles.content}>
                 <Text style={styles.title}>{post.title}</Text>
                 <View style={styles.calendar}>
