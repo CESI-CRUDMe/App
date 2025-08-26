@@ -29,7 +29,7 @@ export default function PostsScreen() {
         }
         setError(null);
         try {
-            const res = await axios.get('http://localhost:3000/api/posts', {
+            const res = await axios.get('https://crudme.mindlens.fr/api/posts', {
                 params: { limit: pageSize, lastID: isRefresh ? '-1' : lastID }
             });
             const data = Array.isArray(res.data) ? res.data : (res.data?.posts || []);

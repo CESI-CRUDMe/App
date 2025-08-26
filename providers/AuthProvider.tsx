@@ -34,7 +34,7 @@ const USERNAME_KEY = 'username';
 const GUEST_MODE_KEY = 'guestMode';
 
 const createApiClient = (getAccessToken: () => string | null, onUnauthorized: () => Promise<void>): AxiosInstance => {
-    const api = axios.create({ baseURL: 'http://localhost:3000/api' });
+    const api = axios.create({ baseURL: 'https://crudme.mindlens.fr/api' });
 
     api.interceptors.request.use((config) => {
         const token = getAccessToken();
@@ -107,7 +107,7 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
 
     const login = useCallback(async (user: string, password: string): Promise<boolean> => {
         try {
-            const res = await axios.post('http://localhost:3000/api/auth', { username: user, password });
+            const res = await axios.post('https://crudme.mindlens.fr/api/auth', { username: user, password });
             const access = res.data?.accessToken;
             if (!access) return false;
             setUsername(user);
