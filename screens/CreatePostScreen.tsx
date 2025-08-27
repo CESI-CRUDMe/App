@@ -3,8 +3,9 @@ import { useUser } from '@/providers/AuthProvider';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Location from 'expo-location';
 import { router } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import MapView, { MapPressEvent, Marker, Region } from 'react-native-maps';
 
@@ -28,12 +29,33 @@ export default function CreatePostScreen() {
     const [pendingCoord, setPendingCoord] = useState<{ lat: number; lng: number } | null>(null);
     const [submitting, setSubmitting] = useState(false);
 
-    const initialRegion: Region = {
+    const [initialRegion, setInitialRegion] = useState<Region>({
         latitude: 46.7,
         longitude: 2.5,
         latitudeDelta: 6,
         longitudeDelta: 6,
-    };
+    });
+
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            try {
+                const { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') return; // permission refusée => on garde la valeur par défaut
+                const loc = await Location.getCurrentPositionAsync({});
+                if (cancelled) return;
+                setInitialRegion({
+                    latitude: loc.coords.latitude,
+                    longitude: loc.coords.longitude,
+                    latitudeDelta: 0.05,
+                    longitudeDelta: 0.05,
+                });
+            } catch (e) {
+                // Silencieux: on garde la région par défaut en cas d'erreur
+            }
+        })();
+        return () => { cancelled = true; };
+    }, []);
 
     const onMapPress = (e: MapPressEvent) => {
         const { latitude: lat, longitude: lng } = e.nativeEvent.coordinate;
