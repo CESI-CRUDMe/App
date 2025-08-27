@@ -8,6 +8,7 @@ import { router } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import MapView, { MapPressEvent, Marker, Region } from 'react-native-maps';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function CreatePostScreen() {
     const { isLogged, accessToken, isGuest } = useUser();
@@ -36,30 +37,45 @@ export default function CreatePostScreen() {
         longitudeDelta: 6,
     });
 
-    useEffect(() => {
-        let cancelled = false;
-        (async () => {
-            try {
-                const { status } = await Location.requestForegroundPermissionsAsync();
-                if (status !== 'granted') return; // permission refusée => on garde la valeur par défaut
-                const loc = await Location.getCurrentPositionAsync({});
-                if (cancelled) return;
-                setInitialRegion({
-                    latitude: loc.coords.latitude,
-                    longitude: loc.coords.longitude,
-                    latitudeDelta: 0.05,
-                    longitudeDelta: 0.05,
-                });
-                // Pré-remplir les champs latitude / longitude si vides
-                setLatitude(lat => lat || loc.coords.latitude.toFixed(6));
-                setLongitude(lng => lng || loc.coords.longitude.toFixed(6));
-                setPendingCoord({ lat: loc.coords.latitude, lng: loc.coords.longitude });
-            } catch (e) {
-                // Silencieux: on garde la région par défaut en cas d'erreur
-            }
-        })();
-        return () => { cancelled = true; };
-    }, []);
+    useFocusEffect(
+        React.useCallback(() => {
+            let cancelled = false;
+            // Reset champs (sauf lat/lon que l'on va remplir ensuite)
+            setTitle('');
+            setContent('');
+            setPrice('');
+            setContactName('');
+            setContactPhone('');
+            setImageRawBase64(null);
+            setImageMime(null);
+            setImageUri(null);
+            setImageDataUri(null);
+            setLatitude('');
+            setLongitude('');
+            setPendingCoord(null);
+
+            (async () => {
+                try {
+                    const { status } = await Location.requestForegroundPermissionsAsync();
+                    if (status !== 'granted' || cancelled) return;
+                    const loc = await Location.getCurrentPositionAsync({});
+                    if (cancelled) return;
+                    setInitialRegion({
+                        latitude: loc.coords.latitude,
+                        longitude: loc.coords.longitude,
+                        latitudeDelta: 0.05,
+                        longitudeDelta: 0.05,
+                    });
+                    setLatitude(loc.coords.latitude.toFixed(6));
+                    setLongitude(loc.coords.longitude.toFixed(6));
+                    setPendingCoord({ lat: loc.coords.latitude, lng: loc.coords.longitude });
+                } catch (e) {
+                    // ignore
+                }
+            })();
+            return () => { cancelled = true; };
+        }, [])
+    );
 
     const onMapPress = (e: MapPressEvent) => {
         const { latitude: lat, longitude: lng } = e.nativeEvent.coordinate;
