@@ -1,14 +1,14 @@
 import { colors, radii, shadows } from '@/constants/theme';
 import { useUser } from '@/providers/AuthProvider';
+import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import MapView, { MapPressEvent, Marker, Region } from 'react-native-maps';
-import { useFocusEffect } from '@react-navigation/native';
 
 export default function CreatePostScreen() {
     const { isLogged, accessToken, isGuest } = useUser();

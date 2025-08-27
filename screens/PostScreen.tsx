@@ -36,19 +36,48 @@ export default function PostScreen() {
         return () => { mounted = false; };
     }, [id, accessToken]);
 
-    // Regrouper tous les useMemo avant tout return conditionnel pour respecter l'ordre des hooks
+    // Amélioration parsing coordonnées
     const { coords, imageUri } = useMemo(() => {
-        let coords = null as null | { latitude: number; longitude: number };
-        let imageUri: string | null = null;
-        if (post) {
-            const lat = parseFloat(post.latitude as any);
-            const lng = parseFloat(post.longitude as any);
-            if (isFinite(lat) && isFinite(lng)) coords = { latitude: lat, longitude: lng };
-            if (post.image_base64) {
-                if (/^data:image\//.test(post.image_base64)) imageUri = post.image_base64; else imageUri = `data:image/jpeg;base64,${post.image_base64}`;
+        if (!post) return { coords: null as null | { latitude: number; longitude: number }, imageUri: null as string | null };
+
+        // Collecte brute possible depuis différentes clés
+        const latCandidate = post.latitude ?? post.lat ?? post?.location?.lat ?? post?.coords?.lat;
+        const lonCandidate = post.longitude ?? post.lng ?? post.lon ?? post?.location?.lng ?? post?.location?.lon ?? post?.coords?.lng ?? post?.coords?.lon;
+
+        const parseValue = (val: any): number | null => {
+            if (val === null || val === undefined) return null;
+            if (typeof val === 'number') return isFinite(val) ? val : null;
+            if (typeof val === 'string') {
+                const cleaned = val.trim().replace(',', '.');
+                const num = parseFloat(cleaned);
+                return isFinite(num) ? num : null;
+            }
+            return null;
+        };
+
+        let lat = parseValue(latCandidate);
+        let lng = parseValue(lonCandidate);
+
+        // Si inversion probable (ex: lat > 90, lon dans plages latitude)
+        if (lat !== null && lng !== null) {
+            if ((lat > 90 || lat < -90) && Math.abs(lng) <= 90 && Math.abs(lat) <= 180) {
+                const tmp = lat; lat = lng; lng = tmp; // swap
             }
         }
-        return { coords, imageUri };
+
+        // Validation finale
+        let finalCoords: { latitude: number; longitude: number } | null = null;
+        if (lat !== null && lng !== null && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
+            finalCoords = { latitude: lat, longitude: lng };
+        }
+
+        // Image
+        let resolvedImage: string | null = null;
+        if (post.image_base64) {
+            if (/^data:image\//.test(post.image_base64)) resolvedImage = post.image_base64; else resolvedImage = `data:image/jpeg;base64,${post.image_base64}`;
+        }
+
+        return { coords: finalCoords, imageUri: resolvedImage };
     }, [post]);
 
     if (loading) {
@@ -99,7 +128,7 @@ export default function PostScreen() {
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Localisation</Text>
                     {coords ? (
-                        <MapView style={styles.map} initialRegion={{ ...coords, latitudeDelta: 0.05, longitudeDelta: 0.05 }}>
+                        <MapView style={styles.map} region={{ ...coords, latitudeDelta: 0.05, longitudeDelta: 0.05 }}>
                             <Marker coordinate={coords} />
                         </MapView>
                     ) : (
