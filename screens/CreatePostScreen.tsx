@@ -50,6 +50,10 @@ export default function CreatePostScreen() {
                     latitudeDelta: 0.05,
                     longitudeDelta: 0.05,
                 });
+                // Pré-remplir les champs latitude / longitude si vides
+                setLatitude(lat => lat || loc.coords.latitude.toFixed(6));
+                setLongitude(lng => lng || loc.coords.longitude.toFixed(6));
+                setPendingCoord({ lat: loc.coords.latitude, lng: loc.coords.longitude });
             } catch (e) {
                 // Silencieux: on garde la région par défaut en cas d'erreur
             }
